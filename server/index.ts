@@ -1,7 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import path from "path";
-import expressStatic from "express";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -10,12 +9,13 @@ const __dirname = dirname(__filename);
 
 function serveStatic(app: any) {
   const staticPath = path.resolve(__dirname, "../client/dist");
+
+  // ✅ Serve static frontend assets (JS, CSS, etc.)
   app.use(express.static(staticPath));
-  app.use(express.Static.static(staticPath));
-  
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(staticPath, "index.html"));
-});
+
+  // ✅ For all non-API routes, serve index.html (SPA support)
+  app.get("*", (_req: Request, res: Response) => {
+    res.sendFile(path.join(staticPath, "index.html"));
   });
 }
 
@@ -23,6 +23,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// ✅ Middleware for logging API requests
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -56,6 +57,7 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
+  // ✅ Global error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -63,16 +65,19 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Serve static frontend in all environments (including production)
+  // ✅ Serve static frontend (React/Wouter app)
   serveStatic(app);
 
-  // Required for Render
+  // ✅ Listen on the correct port (Render uses PORT env var)
   const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-  console.log(`serving on port ${port}`);
-  });
+  server.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true
+    },
+    () => {
+      console.log(`🚀 Server running on http://localhost:${port}`);
+    }
+  );
 })();
