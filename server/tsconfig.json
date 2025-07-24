@@ -4,10 +4,13 @@
     "module": "CommonJS",
     "moduleResolution": "Node",
     "outDir": "./dist",
+    "rootDir": "./",
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["../shared/*"]
     },
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
