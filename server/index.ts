@@ -10,9 +10,12 @@ const __dirname = dirname(__filename);
 
 function serveStatic(app: any) {
   const staticPath = path.resolve(__dirname, "../client/dist");
-  app.use(expressStatic.static(staticPath));
-  app.get("*", (_req: Request, res: Response) => {
-    res.sendFile(path.join(staticPath, "index.html"));
+  app.use(express.static(staticPath));
+  app.use(express.Static.static(staticPath));
+  
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(staticPath, "index.html"));
+});
   });
 }
 
